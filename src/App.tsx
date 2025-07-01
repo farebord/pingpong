@@ -1,5 +1,6 @@
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
+import "./App.css";
 
 interface PaymentInfo {
   transactionId: string;
@@ -8,9 +9,11 @@ interface PaymentInfo {
   amount: number;
 }
 
+const FAIL_PERCENTAGE = 0.25;
+
 const requestMockData = (): Promise<PaymentInfo[]> => {
   return new Promise((resolve, reject) => {
-    const positive = Math.random() > 0.5;
+    const positive = Math.random() > FAIL_PERCENTAGE;
     if (positive)
       resolve([
         {
@@ -84,38 +87,46 @@ function App() {
   }, [startDate, endDate, data]);
 
   if (error) {
-    return error;
+    return (
+      <div className="wrapper">
+        <div className="body">{error}</div>
+      </div>
+    );
   }
 
   return (
-    <>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.currentTarget.value)}
-      />
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.currentTarget.value)}
-      />
-      <button
-        onClick={() => {
-          setEndDate(undefined);
-          setStartDate(undefined);
-        }}
-      >
-        Reset
-      </button>
-      <ul>
-        {getFilteredData.map((transaction) => (
-          <li key={transaction.transactionId}>
-            {transaction.transactionId} - {transaction.date} -{" "}
-            {transaction.description} - {transaction.amount}
-          </li>
-        ))}
-      </ul>
-    </>
+    <div className="wrapper">
+      <div className="body">
+        <div className="filter-tools">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.currentTarget.value)}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.currentTarget.value)}
+          />
+          <button
+            onClick={() => {
+              setEndDate(undefined);
+              setStartDate(undefined);
+            }}
+          >
+            Reset
+          </button>
+        </div>
+        <ul>
+          {getFilteredData.map((transaction) => (
+            <li key={transaction.transactionId}>
+              <strong>{transaction.transactionId}</strong> - {transaction.date}{" "}
+              - {transaction.description} - ${transaction.amount}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
